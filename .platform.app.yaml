@@ -49,4 +49,4 @@ hooks:
         symfony-deploy
 
 relationships:
-    database: "db:postgresql"
+    database: "database:postgresql"
