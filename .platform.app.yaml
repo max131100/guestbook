@@ -54,4 +54,5 @@ relationships:
 
 workers:
     messenger:
-        start: symfony console --time-limit=3600 --memory-limit=64M messenger:consume async
+        commands:
+            start: symfony console --time-limit=3600 --memory-limit=64M messenger:consume async
