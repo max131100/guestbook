@@ -5,21 +5,24 @@ namespace App\Controller;
 use App\Entity\Comment;
 use App\Entity\Conference;
 use App\Form\CommentType;
+use App\Message\CommentMessage;
 use App\Repository\CommentRepository;
 use App\Repository\ConferenceRepository;
-use App\SpamChecker;
 use Doctrine\ORM\EntityManagerInterface;
 use RuntimeException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Twig\Environment;
 
 class ConferenceController extends AbstractController
 {
-    public function __construct(private EntityManagerInterface $entityManager)
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        private MessageBusInterface $bus)
     {
     }
 
@@ -35,7 +38,6 @@ class ConferenceController extends AbstractController
     public function show(
         Request $request,
         Conference $conference,
-        SpamChecker $spamChecker,
         CommentRepository $commentRepository,
         #[Autowire('%photo_dir%')] string $photoDir
     ): Response
@@ -51,6 +53,7 @@ class ConferenceController extends AbstractController
                 $comment->setPhotoFilename($filename);
             }
             $this->entityManager->persist($comment);
+            $this->entityManager->flush();
             $context = [
                 'user_ip' => $request->getClientIp(),
                 'user_agent' => $request->headers->get('user-agent'),
@@ -58,10 +61,7 @@ class ConferenceController extends AbstractController
                 'permalink' => $request->getUri(),
             ];
 
-            if (2 === $spamChecker->getSpamScore($comment, $context)) {
-                throw new RuntimeException('Blatant spam, go away!');
-            }
-            $this->entityManager->flush();
+            $this->bus->dispatch(new CommentMessage($comment->getId(), $context));
 
             return $this->redirectToRoute('conference', ['slug' => $conference->getSlug()]);
         }

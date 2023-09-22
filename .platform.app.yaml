@@ -51,3 +51,7 @@ hooks:
 
 relationships:
     database: "database:postgresql"
+
+workers:
+    messenger:
+        start: symfony console --time-limit=3600 --memory-limit=64M messenger:consume async
