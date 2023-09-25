@@ -4,6 +4,7 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
+        "composer/composer": "^2",
         "php": ">=8.1",
         "ext-ctype": "*",
         "ext-iconv": "*",
