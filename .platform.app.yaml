@@ -59,7 +59,7 @@ crons:
     spec: '50 23 * * *'
     cmd: |
         if [ "$PLATFORM_ENVIRONMENT_TYPE" = "production" ]; then
-        croncape symfony console app:comment:cleanup
+            croncape symfony console app:comment:cleanup
         fi
 
 
