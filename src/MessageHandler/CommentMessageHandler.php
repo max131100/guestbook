@@ -2,6 +2,7 @@
 
 namespace App\MessageHandler;
 
+use App\Notification\CommentReviewNotification;
 use App\Service\ImageOptimizer;
 use App\Message\CommentMessage;
 use App\Repository\CommentRepository;
